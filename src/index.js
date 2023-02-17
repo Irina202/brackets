@@ -1,42 +1,20 @@
 module.exports = function check(str, bracketsConfig) {
-  let result = [];
-  for (let i = 0; i < bracketsConfig.length; i++) {
-    result.push(bracketsConfig[i]);
+  const stack = [];
+  const openBrackets = new Set(bracketsConfig.map(pair => pair[0]));
+  const closeBrackets = new Set(bracketsConfig.map(pair => pair[1]));
+  const matchingBrackets = {};
+  for (const pair of bracketsConfig) {
+    matchingBrackets[pair[1]] = pair[0];
   }
-
-const OPEN_BRACKETS = ['(', '{', '|', '[', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-const BRACKETS_PAIR = {
-  [')']: '(',
-  ['}']: '{',
-  ['|']: '|',
-  [']']: '[',
-  ['1']: '1',
-  ['2']: '2',
-  ['3']: '3',
-  ['4']: '4',
-  ['5']: '5',
-  ['6']: '6',
-  ['7']: '7',
-  ['8']: '8',
-  ['9']: '9',
-};
-let stack = [];
-for (let i = 0; i < str.length; i++) {
-  let currentSymbol = str[i];
-  if (OPEN_BRACKETS.includes(currentSymbol)) {
-    stack.push(currentSymbol);
-  } else {
-    if (stack.length === 0) {
-      return false;
-    }
-    let topElement = stack[stack.length - 1];
-
-    if (BRACKETS_PAIR[currentSymbol] === topElement) {
-      stack.pop();
-    } else {
-      return false;
+  for (const char of str) {
+    if (openBrackets.has(char)) {
+      stack.push(char);
+    } else if (closeBrackets.has(char)) {
+      const lastOpenBracket = stack.pop();
+      if (lastOpenBracket !== matchingBrackets[char]) {
+        return false;
+      }
     }
   }
-}
-return stack.length === 0;
+  return stack.length === 0;
 }
